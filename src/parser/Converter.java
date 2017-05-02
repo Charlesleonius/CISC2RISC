@@ -8,7 +8,7 @@ public class Converter {
 		ArrayList<String> params = new ArrayList<String>();
 		params.add("j");
 		params.add("#1");
-		params.add("#2f");
+		params.add("#2");
 		toIJVM(getOpcode("ADD"), params);
 	}
 	
@@ -19,7 +19,7 @@ public class Converter {
 		opcodes.put("sub", 1);
     }
 	private static String variable = "[A-Za-z0-9]";
-	private static String literal = "#[0-9]";
+	private static String literal = "#+[0-9]";
 	
 	public static Integer getOpcode(String instructionName) {
 		return (Integer) opcodes.get(instructionName.toLowerCase());
