@@ -8,11 +8,12 @@ public class Main {
 //			System.out.println("Invalid arguments. Compiler requires two args: inputFilePath outFilePath");
 //			System.exit(1);
 //		}
-		String inputFilePath = "/Users/charlesleon/desktop/test.txt";
+		String inputFilePath = "C:/Users/ryanm_000/Desktop/CS/README.txt";
 		String outputFilePath = "";
 		try {
 			File textFile = new File(inputFilePath);
 			CISCFile cisc = new CISCFile(textFile);
+			File riscFile = cisc.toRisc();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 			System.out.println("Input file path not found");
