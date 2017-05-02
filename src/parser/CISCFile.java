@@ -40,18 +40,18 @@ public class CISCFile {
 	private ArrayList<Integer> lineNumbers = new ArrayList<Integer>();
 	private ArrayList<String> instructions = new ArrayList<String>();
 	private static String variable = "[A-Za-z0-9]";
-	private static String constant = "[A-Za-z0-9]";
 	private static String label = "[A-Za-z0-9]+:";
 	
 	public CISCFile(File assemblyFile) {
-		ArrayList<String> legalLines = legalLines(assemblyFile);
-		constantsPass(legalLines);
-		variablePass(legalLines);
-		labelPass(legalLines);
-		instructionPass(legalLines);
-		testSuite();
+		ArrayList<String> lines = getLines(assemblyFile);
+		constantsPass(lines);
+		variablePass(lines);
+		labelPass(lines);
+		instructionPass(lines);
+//		testSuite();
 	}
 	
+	@SuppressWarnings("unused")
 	private void testSuite() {
 		printConstants();
 		printVariables();
@@ -79,7 +79,7 @@ public class CISCFile {
 		this.instructions.forEach((i) -> System.out.println(i));
 	}
 	
-	public ArrayList<String> legalLines(File assemblyFile) {
+	public ArrayList<String> getLines(File assemblyFile) {
 		ArrayList<String> lines = new ArrayList<String>();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(assemblyFile));
@@ -107,7 +107,6 @@ public class CISCFile {
 	}
 	
 	private void constantsPass(ArrayList<String> lines) {
-		final int size = lines.size();
 		int i = 0;
 		while (!lines.get(i).equals(".constant")) {
 			i += 1;
@@ -131,7 +130,6 @@ public class CISCFile {
 	}
 	
 	private void variablePass(ArrayList<String> lines) {
-		final int size = lines.size();
 		int i = 0;
 		while (!lines.get(i).equals(".var")) {
 			i += 1;
@@ -156,7 +154,6 @@ public class CISCFile {
 	}
 	
 	public void labelPass(ArrayList<String> lines) {
-		final int size = lines.size();
 		int i = 0;
 		while (!lines.get(i).equals(".end-var")) {
 			i += 1;
@@ -183,7 +180,6 @@ public class CISCFile {
 	}
 	
 	public void instructionPass(ArrayList<String> lines) {
-		final int size = lines.size();
 		int i = 0;
 		while (!lines.get(i).equals(".end-var")) {
 			i += 1;
@@ -195,7 +191,8 @@ public class CISCFile {
 			if(!line.contains(":")) {
 				Boolean instructionStarted = false;
 				String instruction = "";
-				for (int j = 0; j < line.length(); j++) {
+				final int lineLength = line.length();
+				name: for (int j = 0; j < lineLength; j++) {
 					if (instructionStarted == false) {
 						if (!Character.isWhitespace(line.charAt(j))) {
 							instructionStarted = true;
@@ -204,14 +201,18 @@ public class CISCFile {
 					} else {
 						if (!Character.isWhitespace(line.charAt(j))) {
 							instruction += line.charAt(j);
+						} else {
+							instruction += line.charAt(j);
+							break name;
 						}
 					}
 				}
-				if (predefinedInstruction.contains(instruction)) {
-					this.instructions.add(line);
+				if (CISCFile.predefinedInstruction.contains(instruction)) {
+					throw new IllegalArgumentException("Invalid declaration at line " + lineNumbers.get(i).toString() + ". '" + line + "' is not a valid instruction.");
 				}
-				i+= 1;
+				this.instructions.add(line);
 			}
+			i+= 1;
 		}
 		return;
 	}
