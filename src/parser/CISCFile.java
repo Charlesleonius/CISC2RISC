@@ -20,9 +20,10 @@ public class CISCFile {
 	public CISCFile(File assemblyFile) {
 		ArrayList<String> legalLines = legalLines(assemblyFile);
 		constantsPass(legalLines);
-		System.out.println(".constant");
+	}
+	
+	public void printConstants() {
 		this.constants.forEach((k,v) -> System.out.println(k+", "+v));
-		System.out.println(".end-constant");
 	}
 	
 	public ArrayList<String> legalLines(File assemblyFile) {
@@ -49,12 +50,8 @@ public class CISCFile {
 	
 	private void constantsPass(ArrayList<String> lines) {
 		final int size = lines.size();
-		System.out.println("Starting Constants Pass");
-		Boolean constantBegan = false;
-		Boolean constantEnd = false;
 		int i = 0;
 		while (!lines.get(i).equals(".constant")) {
-			System.out.println(lines.get(i));
 			i += 1;
 		}
 		String line;
@@ -68,11 +65,10 @@ public class CISCFile {
 				}
 				this.constants.put(parts[0], Integer.parseInt(parts[1].trim()));
 			} else {
-			    throw new IllegalArgumentException("Invalid declaration at line " + lineNumbers.get(i).toString());
+				throw new IllegalArgumentException("Invalid declaration at line " + lineNumbers.get(i).toString());
 			}
 			i+= 1;
 		}
-		
 	}
 	
 	public ArrayList<String> labelPass(ArrayList<String> lines) {
