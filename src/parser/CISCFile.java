@@ -7,7 +7,8 @@ public class CISCFile {
 	
 	private ArrayList<String> labels;
 	private ArrayList<String> variables;
-	private Map<String, Integer> constants;
+	private static Map<String, Integer> constants = new HashMap<String, Integer>();
+	private ArrayList<Integer> lineNumbers = new ArrayList<Integer>();
 	
 //	Boolean constantsBegan = false;
 //	Boolean constantsEnded = false;
@@ -19,7 +20,9 @@ public class CISCFile {
 	public CISCFile(File assemblyFile) {
 		ArrayList<String> legalLines = legalLines(assemblyFile);
 		constantsPass(legalLines);
+		System.out.println(".constant");
 		this.constants.forEach((k,v) -> System.out.println(k+", "+v));
+		System.out.println(".end-constant");
 	}
 	
 	public ArrayList<String> legalLines(File assemblyFile) {
@@ -27,23 +30,11 @@ public class CISCFile {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(assemblyFile));
 			String line;
+			int i = 0;
 		    while ((line = reader.readLine()) != null) {
-		    	System.out.println(line);
-		    	char c;
-		    	for(int i = 0; i < line.length(); i++) {
-		    		c = line.charAt(i);
-					if (!Character.isWhitespace(c)) { //Not space
-//						if (c == ';') { //Skip line if comment
-//							continue;
-//						}
-						lines.add(line);
-//						if (!Character.isAlphabetic(c)) { //Invalid Case
-//							throw new Exception("Invalid Line");
-//						} else { //Valid Case
-//							lines.add(line);
-//						}
-					}
-				}
+		    	lines.add(line);
+		    	lineNumbers.add(i + 1);
+		    	i += 1;
 		    }
 		    reader.close();
 		} catch (Exception e) {
@@ -61,22 +52,27 @@ public class CISCFile {
 		System.out.println("Starting Constants Pass");
 		Boolean constantBegan = false;
 		Boolean constantEnd = false;
-		for (int i = 0; i < size; i++) {
-			if (lines.get(i).equals(".constant")) {
-				System.out.println("Starting Constants");
-				constantBegan = true;
-				String line;
-				while (!lines.get(i).equals(".end-constant")) {
-					line = lines.get(i);
-					System.out.println(line);
-//					String[] parts = line.split(":");
-					//System.out.println(parts[0]);
-					//System.out.println(parts[1]);
-					//this.constants.put(parts[0], Integer.parseInt(parts[1])); 
-				}
-				break;
-			}
+		int i = 0;
+		while (!lines.get(i).equals(".constant")) {
+			System.out.println(lines.get(i));
+			i += 1;
 		}
+		String line;
+		i += 1;
+		while (!lines.get(i).equals(".end-constant")) {
+			line = lines.get(i);
+			if (line.contains(":")) {
+				String[] parts = line.split(":");
+				if (parts.length < 2) {
+					throw new IllegalArgumentException("Invalid declaration at line " + lineNumbers.get(i).toString());
+				}
+				this.constants.put(parts[0], Integer.parseInt(parts[1].trim()));
+			} else {
+			    throw new IllegalArgumentException("Invalid declaration at line " + lineNumbers.get(i).toString());
+			}
+			i+= 1;
+		}
+		
 	}
 	
 	public ArrayList<String> labelPass(ArrayList<String> lines) {

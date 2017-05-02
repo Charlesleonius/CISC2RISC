@@ -14,9 +14,11 @@ public class Main {
 			File textFile = new File(inputFilePath);
 			CISCFile cisc = new CISCFile(textFile);
 		} catch (NullPointerException e) {
+			e.printStackTrace();
 			System.out.println("Input file path not found");
 			System.exit(1);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw e;
 		}
 		
